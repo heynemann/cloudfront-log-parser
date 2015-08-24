@@ -93,6 +93,14 @@ def parse_line(log_line):
     response.request_size = int(log_line[17])
     response.response_duration = float(log_line[18])
 
+    if log_line[20] != '-':
+        response.ssl_protocol = log_line[20]
+
+    if log_line[21] != '-':
+        response.ssl_cypher = log_line[21]
+
+    response.edge_response_result_type = log_line[22]
+
     return response
 
 
@@ -150,3 +158,6 @@ class Response:
         self.request_protocol = None
         self.request_size = None
         self.response_duration = None
+        self.ssl_protocol = None
+        self.ssl_cypher = None
+        self.edge_response_result_type = None

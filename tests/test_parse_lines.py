@@ -14,7 +14,7 @@ from preggy import expect
 
 from cloudfront_log_parser import parse, Response
 from tests.base import TestCase
-from tests.fixtures import LOG_LINE, QS_LOG_LINE, ABORTED_LOG_LINE, COOKIE_LOG_LINE, XF_LOG_LINE
+from tests.fixtures import LOG_LINE, QS_LOG_LINE, ABORTED_LOG_LINE, COOKIE_LOG_LINE, XF_LOG_LINE, SSL_LOG_LINE
 
 
 class ParseOneLineTestCase(TestCase):
@@ -204,6 +204,41 @@ class ParseOneLineTestCase(TestCase):
 
         item = result[0]
         expect(item.ip_address).to_equal('179.34.7.54')
+
+    def test_ssl_protocol_is_null_when_hyphen(self):
+        result = parse(LOG_LINE)
+        expect(result).not_to_be_empty()
+
+        item = result[0]
+        expect(item.ssl_protocol).to_be_null()
+
+    def test_can_get_ssl_protocol(self):
+        result = parse(SSL_LOG_LINE)
+        expect(result).not_to_be_empty()
+
+        item = result[0]
+        expect(item.ssl_protocol).to_equal('SSLv3')
+
+    def test_ssl_cypher_is_null_when_hyphen(self):
+        result = parse(LOG_LINE)
+        expect(result).not_to_be_empty()
+
+        item = result[0]
+        expect(item.ssl_cypher).to_be_null()
+
+    def test_can_get_ssl_cypher(self):
+        result = parse(SSL_LOG_LINE)
+        expect(result).not_to_be_empty()
+
+        item = result[0]
+        expect(item.ssl_cypher).to_equal('AES256-SHA')
+
+    def test_can_get_edge_response_result(self):
+        result = parse(LOG_LINE)
+        expect(result).not_to_be_empty()
+
+        item = result[0]
+        expect(item.edge_response_result_type).to_equal(Response.Result.Miss)
 
 
 class ParseMultiLineTestCase(TestCase):
