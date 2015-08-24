@@ -1,0 +1,22 @@
+# This file is part of cloudfront-log-parser.
+# https://github.com/heynemann/cloudfront-log-parser
+
+# Licensed under the MIT license:
+# http://www.opensource.org/licenses/MIT-license
+# Copyright (c) 2015, Bernardo Heynemann <heynemann@gmail.com>
+
+[run]
+omit =
+    *tests.py
+branch = True
+source =
+    cloudfront_log_parser
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    from urllib.parse import parse_qs
+    except ImportError:
