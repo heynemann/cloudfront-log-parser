@@ -30,14 +30,14 @@ except ImportError:
 from cloudfront_log_parser.version import __version__  # NOQA
 
 
-def parse(log_lines):
+def parse(reader):
     result = []
 
-    if isinstance(log_lines, six.string_types):
-        reader = StringIO(log_lines)
+    if isinstance(reader, six.string_types):
+        reader = StringIO(reader)
 
     for line in csv.reader(reader, dialect="excel-tab"):
-        if line[0] == "#":
+        if len(line) < 2:
             continue
         result.append(parse_line(line))
 
@@ -73,7 +73,7 @@ def parse_line(log_line):
     response.cloudfront_host = log_line[6]
     response.path = log_line[7]
 
-    response.status_code = int(log_line[8])
+    response.status_code = log_line[8]
     response.aborted = log_line[8] == '000'
 
     response.referrer = log_line[9]

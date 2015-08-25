@@ -8,13 +8,23 @@
 # http://www.opensource.org/licenses/MIT-license
 # Copyright (c) 2015, Bernardo Heynemann <heynemann@gmail.com>
 
+import logging
 from datetime import datetime
 
 from preggy import expect
+try:
+    from cStringIO import StringIO
+except ImportError:
+    try:
+        from six import StringIO
+    except ImportError:
+        logging.warning("Error importing dependencies, probably setup.py reading package. Ignoring...")
 
 from cloudfront_log_parser import parse, Response
 from tests.base import TestCase
-from tests.fixtures import LOG_LINE, QS_LOG_LINE, ABORTED_LOG_LINE, COOKIE_LOG_LINE, XF_LOG_LINE, SSL_LOG_LINE
+from tests.fixtures import (
+    LOG_LINE, QS_LOG_LINE, ABORTED_LOG_LINE, COOKIE_LOG_LINE, XF_LOG_LINE, SSL_LOG_LINE  # , get_all_combinations
+)
 
 
 class ParseOneLineTestCase(TestCase):
@@ -89,7 +99,7 @@ class ParseOneLineTestCase(TestCase):
         expect(result).not_to_be_empty()
 
         item = result[0]
-        expect(item.status_code).to_equal(200)
+        expect(item.status_code).to_equal('200')
         expect(item.aborted).to_be_false()
 
     def test_can_get_aborted_request(self):
@@ -97,7 +107,7 @@ class ParseOneLineTestCase(TestCase):
         expect(result).not_to_be_empty()
 
         item = result[0]
-        expect(item.status_code).to_equal(0)
+        expect(item.status_code).to_equal('000')
         expect(item.aborted).to_be_true()
 
     def test_can_get_referrer(self):
@@ -242,4 +252,16 @@ class ParseOneLineTestCase(TestCase):
 
 
 class ParseMultiLineTestCase(TestCase):
-    pass
+    def test_can_parse_file_like(self):
+        items = """#Version: 1.0
+#Fields: date time x-edge-location sc-bytes c-ip cs-method cs(Host) cs-uri-stem sc-status cs(Referer) cs(User-Agent) cs-uri-query cs(Cookie) x-edge-result-type x-edge-request-id x-host-header cs-protocol cs-bytes time-taken x-forwarded-for ssl-protocol ssl-cipher x-edge-response-result-type
+%s
+%s""" % (
+            LOG_LINE,
+            SSL_LOG_LINE,
+        )
+
+        log_line = StringIO(items)
+        result = parse(log_line)
+        expect(result).not_to_be_empty()
+        expect(result).to_length(2)
