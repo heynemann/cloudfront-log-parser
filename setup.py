@@ -49,7 +49,7 @@ Parse cloudfront access log lines with some extra intelligence.
     install_requires=[
         'six>=1.9.0,<2.0.0',
         'cloudfront-edge-codes>=0.1.3',
-        'user-agents>=0.3.2,<0.4.0',
+        'user-agents>=1.0.0,<2.0.0',
     ],
     extras_require={
         'tests': tests_require,
